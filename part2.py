@@ -60,7 +60,10 @@ def main():
 
     print("\nAlice's Original Message: " + str(b'Hi Bob!'))
     print("Alice's Encrypted Message: " + str(c0))
-    print("\n--- Man in the Middle Attack ---")
+    print("\nBob's Original Message: " + str(b'Hi Alice!'))
+    print("Bob's Encrypted Message: " + str(c1))
+    
+    print("\n--- Man in the Middle Attack ---\n")
     print("Mallory intercepts and decrypts messages from both parties")
     
     # Mallory intercepts, decrypts, and modifies their messages
@@ -70,29 +73,34 @@ def main():
     boxM = AES.new(bytes(kmVal, 'utf-8'), AES.MODE_CBC, iv)
     decMA = AES.new(bytes(kaVal, 'utf-8'), AES.MODE_CBC, iv)
     decMB = AES.new(bytes(kbVal, 'utf-8'), AES.MODE_CBC, iv)
+
+    badc0 = boxM.encrypt(mMalA)
+    badc1 = boxM.encrypt(mMalB)
+
     print("\nOriginal Message Mallory gets from Alice: " + str(c0))
     print("Message Mallory decrypts from Alice: " + str(unpad(decMA.decrypt(c0), 16)))
     print("\nOriginal Message Mallory gets from Bob: " + str(c1))
     print("Message Mallory decrypts from Bob: " + str(unpad(decMB.decrypt(c1), 16)))
 
-    print(' --- Mallory encrypts and sends out different messages ---')
-    print("\nNew Message being sent from Alice to Bob: " + str(bMalA))
-    print("New Encrypted Message from Alice to Bob: " 
-            + str(boxM.encrypt(mMalA)))
-    print("\nNew Message being sent from Bob to Alice: " + str(bMalB))
-    print("New Encrypted Message from Bob to Alice: " 
-            + str(boxM.encrypt(mMalB)))
+    print('\n --- Mallory encrypts and sends out different messages ---')
+    print("\nNew Message being sent from Alice to Bob: \n" + str(bMalA))
+    print()
+    print("New Encrypted Message from Alice to Bob: \n" 
+            + str(badc0))
+    print("\nNew Message being sent from Bob to Alice: \n" + str(bMalB))
+    print()
+    print("New Encrypted Message from Bob to Alice: \n" 
+            + str(badc1))
 
     # message is sent, and decrypted by both parties for viewing
     # message is different than original message, but only Mallory knows that
-    # print("Alice's Message after Decryption")
-    # print("(Using only Bob's Info to Decrypt): " + str(unpad(decB.decrypt(c0), 16)))
+    print("\n--- New Outcome After Mallory's Deceit ---\n")
+    print("Alice's New Message (Using only Bob's Info to Decrypt):")
+    print(str(unpad(decB.decrypt(badc0), 16)))
 
-    # print("\nBob's Original Message: " + str(b'Hi Alice!'))
-    # print("Bob's Encrypted Message: " + str(c1))
-    # print("Bob's Message after Decryption")
-    # print("(Using only Alice's Info to Decrypt): " + str(unpad(decA.decrypt(c1), 16)))
-    # print()
+    print("\nBob's New Message (Using only Alice's Info to Decrypt):")
+    print(str(unpad(decA.decrypt(badc1), 16)))
+    print()
 
 if __name__ == "__main__":
     main()
