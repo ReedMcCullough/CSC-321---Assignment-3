@@ -29,7 +29,7 @@ def main():
     b_final = pow(g, b, p)
     # Mallory
     m = random.randint(0, p - 1)
-    m_final = pow(g, b, p)
+    m_final = pow(g, m, p)
 
     # ALICE ATTEMPTS TO SEND BOB a, BOB ATTEMPTS TO SEND ALICE b
     sA = pow(b_final, a, p)
@@ -70,12 +70,13 @@ def main():
     kM = SHA256.new()
     kM.update(sM.to_bytes(256, 'big'))
     kmVal = kA.hexdigest()[:16]
-    boxM = AES.new(bytes(kmVal, 'utf-8'), AES.MODE_CBC, iv)
+    boxMA = AES.new(bytes(kmVal, 'utf-8'), AES.MODE_CBC, iv)
+    boxMB = AES.new(bytes(kmVal, 'utf-8'), AES.MODE_CBC, iv)
     decMA = AES.new(bytes(kaVal, 'utf-8'), AES.MODE_CBC, iv)
     decMB = AES.new(bytes(kbVal, 'utf-8'), AES.MODE_CBC, iv)
-
-    badc0 = boxM.encrypt(mMalA)
-    badc1 = boxM.encrypt(mMalB)
+    
+    badc0 = boxMA.encrypt(mMalA)
+    badc1 = boxMB.encrypt(mMalB)
 
     print("\nOriginal Message Mallory gets from Alice: " + str(c0))
     print("Message Mallory decrypts from Alice: " + str(unpad(decMA.decrypt(c0), 16)))
@@ -101,6 +102,65 @@ def main():
     print("\nBob's New Message (Using only Alice's Info to Decrypt):")
     print(str(unpad(decA.decrypt(badc1), 16)))
     print()
+
+    # repeating the attacks, but this time by changing g to 1, p, and p-1
+    print(" --- Repeating Attack, but with this time with changing g ---")
+
+    g = 1 # g = p, and g = p-1
+    
+    # Alice
+    a = random.randint(0, p - 1)
+    a_final = pow(g, a, p)
+    # Bob
+    b = random.randint(0, p - 1)
+    b_final = pow(g, b, p)
+    # Mallory
+    m = random.randint(0, p - 1)
+    m_final = pow(g, m, p)
+
+    print("\nA and B when g is changed to " + str(g))
+    print("A: " + str(a_final))
+    print("B: " + str(b_final))
+    
+    sA = pow(b_final, a, p)
+    sB = pow(a_final, b, p)
+    sM = pow(m_final, a, p)
+
+    boxA = AES.new(bytes(kaVal, 'utf-8'), AES.MODE_CBC, iv)
+    decA = AES.new(bytes(kaVal, 'utf-8'), AES.MODE_CBC, iv)
+
+    boxB = AES.new(bytes(kbVal, 'utf-8'), AES.MODE_CBC, iv)
+    decB = AES.new(bytes(kbVal, 'utf-8'), AES.MODE_CBC, iv)
+
+    c0 = boxA.encrypt(mA)
+    c1 = boxB.encrypt(mB)
+
+    kM = SHA256.new()
+    kM.update(sM.to_bytes(256, 'big'))
+    kmVal = kA.hexdigest()[:16]
+    boxMA = AES.new(bytes(kmVal, 'utf-8'), AES.MODE_CBC, iv)
+    boxMB = AES.new(bytes(kmVal, 'utf-8'), AES.MODE_CBC, iv)
+    decMA = AES.new(bytes(kaVal, 'utf-8'), AES.MODE_CBC, iv)
+    decMB = AES.new(bytes(kbVal, 'utf-8'), AES.MODE_CBC, iv)
+    
+    badc0 = boxMA.encrypt(mMalA)
+    badc1 = boxMB.encrypt(mMalB)
+
+    print("\nMessages w/ g = " + str(g) +"\n")
+
+    print("Messages after Mallory modifies them and encryptes with g = 1")
+    print(str(badc0))
+    print(str(badc1))
+
+    print("\nNew Messages after Alice and Bob decrypt them:")
+    print(str(unpad(decB.decrypt(badc0), 16)))
+    print(str(unpad(decA.decrypt(badc1), 16)))
+    print()
+
+
+
+
+
 
 if __name__ == "__main__":
     main()
