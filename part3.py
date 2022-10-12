@@ -55,11 +55,24 @@ def main():
     print(decA, decB)
 
     # Mallory knows Alice's public key, and can use it
-    # to encrypt her own messages
-    malS = pow((pow(2, e)*c), d, n) // 2
-    print(malS)
+    # and the information after Alice decrypts her
+    # modified message to learn the secret s
+    addOn = (pow(2, e) * c)
+    combo = pow(addOn, d, n) // 2
+    print(combo)
     print()
     print(secret)
+
+    test1 = pow(int('Hi Alice!'.encode().hex(), 16), d, n)
+    test2 = pow(int('Hi Bob!'.encode().hex(), 16), d, n)
+    test3 = (test1 * test2) % n
+
+    print()
+    print(test1)
+    print()
+    print(test2)
+    print()
+    print(test3)
 
 
 
