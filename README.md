@@ -1,7 +1,5 @@
 # Vulnerabilities-in-Communication-Security - CSC 321 <br>
 
-Placeholder <br>
-
-Part 1: Simple implementation of message transfer with ______ <br>
+Part 1: Simple implementation of message transfer with asymmetric key encryption/decryption and SHA256. <br>
 
 Part 2: 
